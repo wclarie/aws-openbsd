@@ -130,7 +130,7 @@ EOF
 		https://raw.githubusercontent.com/ajacoutot/aws-openbsd/master/ec2-init.sh
 
 	pr_action "extracting sets"
-	for i in ${_WRKDIR}/*${_REL}.tgz ${_MNT}/var/sysmerge/{,x}etc.tgz; do
+	for i in ${_WRKDIR}/*${_REL}.tgz ${_MNT}/var/sysmerge/etc.tgz; do
 		doas tar xzphf $i -C ${_MNT}
 	done
 

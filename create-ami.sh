@@ -123,7 +123,7 @@ EOF
 
 	pr_action "fetching sets from ${MIRROR:##*//}"
 	( cd ${_WRKDIR} &&
-		ftp -V ${MIRROR}/pub/OpenBSD/${RELEASE:-snapshots}/amd64/{bsd{,.mp,.rd},{base,comp,game,man,xbase,xshare,xfont,xserv}${_REL}.tgz} )
+		ftp -V ${MIRROR}/pub/OpenBSD/${RELEASE:-snapshots}/amd64/{bsd{,.mp,.rd},{base,comp,man}${_REL}.tgz} )
 
 	pr_action "fetching ec2-init"
 	ftp -V -o ${_WRKDIR}/ec2-init \
@@ -189,7 +189,7 @@ EOF
 	echo "127.0.0.1\tlocalhost" | doas tee ${_MNT}/etc/hosts
 	echo "::1\t\tlocalhost" | doas tee -a ${_MNT}/etc/hosts
 	doas chroot ${_MNT} env -i ln -sf /usr/share/zoneinfo/UTC /etc/localtime
-	doas chroot ${_MNT} env -i ldconfig /usr/local/lib /usr/X11R6/lib
+	doas chroot ${_MNT} env -i ldconfig /usr/local/lib
 	doas chroot ${_MNT} env -i rcctl disable sndiod
 
 #	cat <<'EOF' | doas tee ${_MNT}/etc/hotplugd/attach

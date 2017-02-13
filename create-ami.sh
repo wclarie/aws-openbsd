@@ -125,9 +125,8 @@ EOF
 	( cd ${_WRKDIR} &&
 		ftp -V ${MIRROR}/pub/OpenBSD/${RELEASE:-snapshots}/amd64/{bsd{,.mp,.rd},{base,comp,man}${_REL}.tgz} )
 
-	pr_action "fetching ec2-init"
-	ftp -V -o ${_WRKDIR}/ec2-init \
-		https://raw.githubusercontent.com/ajacoutot/aws-openbsd/master/ec2-init.sh
+	pr_action "copying ec2-init"
+	cp ./ec2-init.sh ${_WRKDIR}/ec2-init
 
 	pr_action "extracting sets"
 	for i in ${_WRKDIR}/*${_REL}.tgz ${_MNT}/var/sysmerge/etc.tgz; do

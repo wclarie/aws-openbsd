@@ -160,9 +160,9 @@ EOF
 	doas installboot -r ${_MNT} ${_VNDEV}
 
 	pr_action "configuring the image"
-	# XXX hardcoded
-	echo "https://ftp.fr.openbsd.org/pub/OpenBSD" | doas tee \
-		${_MNT}/etc/installurl
+	echo "${MIRROR}/pub/OpenBSD" | doas tee ${_MNT}/etc/installurl
+	echo "installpath = ${MIRROR}" | sed -e 's/https:\/\///g' | doas tee \
+		${_MNT}/etc/pkg.conf
 	_duid=$(doas disklabel ${_VNDEV} | grep duid | cut -d ' ' -f 2)
 	echo "${_duid}.b none swap sw" | doas tee ${_MNT}/etc/fstab
 	echo "${_duid}.a / ffs rw 1 1" | doas tee -a ${_MNT}/etc/fstab

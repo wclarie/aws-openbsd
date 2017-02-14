@@ -196,7 +196,6 @@ EOF
 #	doas chroot ${_MNT} env -i rcctl enable hotplugd
 
 	pr_action "unmounting the image"
-	doas umount ${_MNT}/usr/X11R6
 	doas umount ${_MNT}/usr/local
 	doas umount ${_MNT}/usr
 	doas umount ${_MNT}/var

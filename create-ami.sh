@@ -75,10 +75,6 @@ create_img() {
 	pr_action "creating image container"
 	vmctl create ${_IMG} -s 4G
 
-	# matches >7G disklabel(8) automatic allocation minimum sizes (and not
-	# disklabel -Aw ${_VNDEV}) except for /var (80M->256M) (to accomodate
-	# syspatch(8)); we hardcode a 4G image because it's easy to extend /home
-	# if we need more space for specialized usage (or even add a new EBS)
 	pr_action "creating and mounting image filesystem"
 	doas vnconfig ${_VNDEV} ${_IMG}
 	doas fdisk -c 522 -h 255 -s 63 -yi ${_VNDEV}
@@ -97,18 +93,17 @@ boundend: 8385930
 
 16 partitions:
 #                size           offset  fstype [fsize bsize   cpg]
-  a:           176640               64  4.2BSD   2048 16384     1 
-  b:           160661           176704    swap                    
-  c:          8388608                0  unused                    
-  d:           257024           337376  4.2BSD   2048 16384     1 
-  e:           514080           594400  4.2BSD   2048 16384     1 
-  f:          1831392          1108480  4.2BSD   2048 16384     1 
-  g:          1044224          2939872  4.2BSD   2048 16384     1 
-  h:          4192960          3984096  4.2BSD   2048 16384     1 
-  i:           211552          8177056  4.2BSD   2048 16384     1
+  a:           273024               64  4.2BSD   2048 16384     1
+  b:           257057           273088    swap
+  c:          8388608                0  unused
+  d:           273056           530176  4.2BSD   2048 16384     1
+  e:           514080           803232  4.2BSD   2048 16384     1
+  f:          1044224          1317312  4.2BSD   2048 16384     1
+  g:          5237184          2361536  4.2BSD   2048 16384     1
+  h:           514080          7598720  4.2BSD   2048 16384     1
 EOF
 	doas disklabel -R ${_VNDEV} ${_WRKDIR}/disklabel
-	for _p in a d e f g h i; do
+	for _p in a d e f g h; do
 		doas newfs /dev/r${_VNDEV}${_p}
 	done
 	doas mount /dev/${_VNDEV}a ${_MNT}
@@ -116,10 +111,9 @@ EOF
 	doas mount /dev/${_VNDEV}d ${_MNT}/tmp
 	doas mount /dev/${_VNDEV}e ${_MNT}/var
 	doas mount /dev/${_VNDEV}f ${_MNT}/usr
-	doas install -d ${_MNT}/usr/{X11R6,local}
-	doas mount /dev/${_VNDEV}g ${_MNT}/usr/X11R6
-	doas mount /dev/${_VNDEV}h ${_MNT}/usr/local
-	doas mount /dev/${_VNDEV}i ${_MNT}/home
+	doas install -d ${_MNT}/usr/local
+	doas mount /dev/${_VNDEV}g ${_MNT}/usr/local
+	doas mount /dev/${_VNDEV}h ${_MNT}/home
 
 	pr_action "fetching sets from ${MIRROR:##*//}"
 	( cd ${_WRKDIR} &&
@@ -166,14 +160,12 @@ EOF
 	_duid=$(doas disklabel ${_VNDEV} | grep duid | cut -d ' ' -f 2)
 	echo "${_duid}.b none swap sw" | doas tee ${_MNT}/etc/fstab
 	echo "${_duid}.a / ffs rw 1 1" | doas tee -a ${_MNT}/etc/fstab
-	echo "${_duid}.i /home ffs rw,nodev,nosuid 1 2" | doas tee -a \
+	echo "${_duid}.h /home ffs rw,nodev,nosuid 1 2" | doas tee -a \
 		${_MNT}/etc/fstab
 	echo "${_duid}.d /tmp ffs rw,nodev,nosuid 1 2" | doas tee -a \
 		${_MNT}/etc/fstab
 	echo "${_duid}.f /usr ffs rw,nodev 1 2" | doas tee -a ${_MNT}/etc/fstab
-	echo "${_duid}.g /usr/X11R6 ffs rw,nodev 1 2" | doas tee -a \
-		${_MNT}/etc/fstab
-	echo "${_duid}.h /usr/local ffs rw,wxallowed,nodev 1 2" | doas tee -a \
+	echo "${_duid}.g /usr/local ffs rw,wxallowed,nodev 1 2" | doas tee -a \
 		${_MNT}/etc/fstab
 	echo "${_duid}.e /var ffs rw,nodev,nosuid 1 2" | doas tee -a \
 		${_MNT}/etc/fstab

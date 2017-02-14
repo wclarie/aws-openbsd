@@ -62,12 +62,17 @@ ec2_pubkey()
 ec2_ipv6()
 {
 	local _mac="$(mock meta-data/mac)"
-	local _ipv6_addr="$(mock meta-data/network/interfaces/macs/${_mac}/ipv6s)"
-	# XXX TODO: Handle multiple IPv6 addresses
-	if [[ -n ${_ipv6_addr} ]]; then
+	local _ipv6_addrs="$(mock meta-data/network/interfaces/macs/${_mac}/ipv6s)"
+
+	if [[ -n ${_ipv6_addrs} ]]; then
 		/sbin/ifconfig xnf0 inet6 autoconf
-		/sbin/ifconfig xnf0 inet6 ${_ipv6_addr}
-		print -- "rtsol\ninet6 ${_ipv6_addr}" >>/etc/hostname.xnf0
+		print -- "rtsol" >> /etc/hostname.xnf0
+
+		local _addr
+		for _addr in ${_ipv6_addrs}; do
+			/sbin/ifconfig xnf0 inet6 ${_addr}
+			print -- "inet6 ${_addr}" >> /etc/hostname.xnf0
+		done
 	fi
 }
 

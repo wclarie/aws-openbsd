@@ -171,7 +171,7 @@ EOF
 		${_MNT}/etc/fstab
 	doas sed -i "s,^tty00.*,tty00	\"/usr/libexec/getty std.9600\"	vt220   on  secure," \
 		${_MNT}/etc/ttys
-	doas sed -Ei sed -E "s,^(ttyC.?).*,\1   \"/usr/libexec/getty std.9600\"   vt220   off secure,g" \
+	doas sed -Ei "s,^(ttyC.?).*,\1   \"/usr/libexec/getty std.9600\"   vt220   off secure,g" \
 		${_MNT}/etc/ttys
 	echo "stty com0 9600" | doas tee ${_MNT}/etc/boot.conf
 	echo "set tty com0" | doas tee -a ${_MNT}/etc/boot.conf
